@@ -284,7 +284,15 @@
                 </td>
                 <td style="width:45%; padding-left:20px;">
                     <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">Owner Signature</div>
-                    <div style="height:60px;"></div>
+                    @php
+                        $ownerSigPath = storage_path('app/' . ($ownerSignaturePath ?? 'signatures/owner_signature.png'));
+                    @endphp
+                    @if(file_exists($ownerSigPath))
+                        <img src="{{ $ownerSigPath }}"
+                             style="height:45px; max-width:180px; object-fit:contain; display:block;">
+                    @else
+                        <div style="height:45px; border-bottom:1px solid #000; width:180px;"></div>
+                    @endif
                     <div class="sig-line">Faisal Rasheed</div>
                 </td>
             </tr>

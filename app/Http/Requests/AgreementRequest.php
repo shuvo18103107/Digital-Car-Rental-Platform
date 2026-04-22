@@ -16,20 +16,21 @@ class AgreementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'car_make_model'      => ['required', 'string', 'max:100'],
-            'plate_number'        => ['required', 'string', 'max:30'],
-            'weekly_rent'         => ['required', 'numeric', 'min:1', 'max:99999.99'],
-            'pickup_date'         => ['required', 'date'],
-            'pickup_time'         => ['required', 'date_format:H:i'],
-            'driver_name'         => ['required', 'string', 'max:100'],
-            'renter_address'      => ['required', 'string', 'max:500'],
-            'license_number'      => ['required', 'string', 'max:50'],
-            'renter_contact'      => ['required', 'string', 'max:20'],
-            'driver_email'        => ['required', 'email', 'max:150'],
-            'towing_name'         => ['nullable', 'string', 'max:100'],
-            'towing_phone'        => ['nullable', 'string', 'max:20'],
-            'walkaround_comments' => ['nullable', 'string', 'max:1000'],
-            'signature'           => ['required', 'string'],
+            'car_make_model' => ['required', 'string', 'max:100'],
+            'plate_number' => ['required', 'string', 'max:30'],
+            'weekly_rent' => ['required', 'numeric', 'min:1', 'max:99999.99'],
+            'pickup_date' => ['required', 'date'],
+            'pickup_time' => ['required', 'date_format:H:i'],
+            'driver_name' => ['required', 'string', 'max:100'],
+            'renter_address' => ['required', 'string', 'max:500'],
+            'license_number' => ['required', 'string', 'max:50'],
+            'renter_contact' => ['required', 'string', 'max:20'],
+            'driver_email' => ['required', 'email', 'max:150'],
+            'signature' => ['required', 'string'],
+            'passport' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'licence_front' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'licence_back' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'visa' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
     }
 

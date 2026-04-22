@@ -154,11 +154,12 @@ class SettingsSeeder extends Seeder
 ';
 
         $rows = [
-            ['key' => 'agreement_body', 'value' => $agreementBody],
-            ['key' => 'owner_email',    'value' => 'faisal@carrentalperth.com'],
-            ['key' => 'admin_email',    'value' => 'admin@carrentalperth.com'],
-            ['key' => 'owner_name',     'value' => 'Faisal Rasheed'],
-            ['key' => 'company_name',   'value' => 'Faisal Car Rentals Perth'],
+            ['key' => 'agreement_body',       'value' => $agreementBody],
+            ['key' => 'owner_email',          'value' => 'faisal@carrentalperth.com'],
+            ['key' => 'admin_email',          'value' => 'admin@carrentalperth.com'],
+            ['key' => 'owner_name',           'value' => 'Faisal Rasheed'],
+            ['key' => 'company_name',         'value' => 'Faisal Car Rentals Perth'],
+            ['key' => 'owner_signature_path', 'value' => 'signatures/owner_signature.png'],
         ];
 
         foreach ($rows as $row) {

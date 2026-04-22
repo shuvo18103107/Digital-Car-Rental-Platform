@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Agreements\Schemas;
 
 use Carbon\Carbon;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -47,18 +48,23 @@ class AgreementInfolist
                         TextEntry::make('renter_address')->label('Address')->columnSpanFull(),
                     ]),
 
-                Section::make('Towing / Breakdown')
+                Section::make('Handover details')
+                    ->icon('heroicon-o-wrench-screwdriver')
                     ->columns(2)
-                    ->collapsed()
                     ->schema([
-                        TextEntry::make('towing_name')->label('Approved Mechanic')->placeholder('Not provided'),
-                        TextEntry::make('towing_phone')->label('Towing Phone')->placeholder('Not provided'),
-                    ]),
+                        TextEntry::make('towing_name')
+                            ->label('Towing company')
+                            ->default('— Not yet set')
+                            ->color(fn ($state) => $state === null ? 'warning' : 'success'),
 
-                Section::make('Walkaround & Notes')
-                    ->collapsed()
-                    ->schema([
-                        TextEntry::make('walkaround_comments')->label('Walkaround Comments')->placeholder('None')->columnSpanFull(),
+                        TextEntry::make('towing_phone')
+                            ->label('Towing phone')
+                            ->default('— Not yet set'),
+
+                        TextEntry::make('walkaround_comments')
+                            ->label('Walkaround notes')
+                            ->default('— Not yet completed')
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Signature')
@@ -67,6 +73,41 @@ class AgreementInfolist
                             ->label('')
                             ->disk('local')
                             ->height(80)
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Identity documents')
+                    ->icon('heroicon-o-identification')
+                    ->collapsible()
+                    ->schema([
+                        RepeatableEntry::make('documents')
+                            ->schema([
+                                TextEntry::make('document_type_label')
+                                    ->label('Document')
+                                    ->badge()
+                                    ->color(fn ($record) => match ($record?->document_type) {
+                                        'passport' => 'info',
+                                        'licence_front' => 'success',
+                                        'licence_back' => 'warning',
+                                        'visa' => 'gray',
+                                        default => 'gray',
+                                    }),
+
+                                TextEntry::make('file_size_formatted')
+                                    ->label('Size'),
+
+                                TextEntry::make('original_name')
+                                    ->label('Filename')
+                                    ->limit(30),
+
+                                TextEntry::make('id')
+                                    ->label('Download')
+                                    ->formatStateUsing(fn () => '↓ Download')
+                                    ->url(fn ($record) => $record ? route('admin.documents.download', $record) : '#')
+                                    ->openUrlInNewTab()
+                                    ->color('primary'),
+                            ])
+                            ->columns(4)
                             ->columnSpanFull(),
                     ]),
 

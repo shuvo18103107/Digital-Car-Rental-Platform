@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Agreement extends Model
 {
@@ -53,4 +54,9 @@ class Agreement extends Model
         'bond_amount' => 'decimal:2',
         'weekly_rent' => 'decimal:2',
     ];
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(AgreementDocument::class);
+    }
 }

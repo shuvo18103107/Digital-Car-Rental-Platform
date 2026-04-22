@@ -5,9 +5,6 @@
 @section('content')
 <div x-data="{
     termsOpen: false,
-    towingOpen: {{ (old('towing_name') || old('towing_phone')) ? 'true' : 'false' }},
-    walkaroundOpen: {{ old('walkaround_comments') ? 'true' : 'false' }},
-
     signaturePad: null,
     signatureData: '',
     hasSigned: false,
@@ -165,6 +162,7 @@
                   x-ref="agreementForm"
                   action="{{ route('agreement.store') }}"
                   method="POST"
+                  enctype="multipart/form-data"
                   @submit="submit($event)"
                   class="space-y-6"
                   novalidate>
@@ -304,88 +302,6 @@
                     </div>
                 </div>
 
-                {{-- Section 9: Towing (collapsible) --}}
-                <div class="section-card">
-                    <button type="button" @click="towingOpen = !towingOpen"
-                        class="-m-6 flex w-[calc(100%+3rem)] items-center justify-between rounded-2xl p-6 text-left transition hover:bg-slate-50 focus:outline-none">
-                        <div class="flex items-center gap-3">
-                            <span class="section-number">9</span>
-                            <div>
-                                <h3 class="section-title leading-tight">Towing / Breakdown</h3>
-                                <span class="text-xs text-slate-400">Your preferred mechanic details</span>
-                            </div>
-                        </div>
-                        <div class="flex shrink-0 items-center gap-2">
-                            <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">Optional</span>
-                            <svg class="h-4 w-4 text-slate-400 transition-transform duration-200"
-                                 :class="towingOpen ? 'rotate-180' : ''"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </button>
-                    <div x-show="towingOpen"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 -translate-y-1"
-                         class="mt-5 border-t border-slate-100 pt-5">
-                        <div class="grid gap-5 sm:grid-cols-2">
-                            <div>
-                                <label class="form-label" for="towing_name">Approved Mechanic Name</label>
-                                <input id="towing_name" type="text" name="towing_name"
-                                    value="{{ old('towing_name') }}"
-                                    placeholder="Mechanic / towing company name"
-                                    class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label" for="towing_phone">Towing Phone</label>
-                                <input id="towing_phone" type="tel" name="towing_phone"
-                                    value="{{ old('towing_phone') }}"
-                                    placeholder="Phone number"
-                                    class="form-input">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Section 16: Walkaround (collapsible) --}}
-                <div class="section-card">
-                    <button type="button" @click="walkaroundOpen = !walkaroundOpen"
-                        class="-m-6 flex w-[calc(100%+3rem)] items-center justify-between rounded-2xl p-6 text-left transition hover:bg-slate-50 focus:outline-none">
-                        <div class="flex items-center gap-3">
-                            <span class="section-number">16</span>
-                            <div>
-                                <h3 class="section-title leading-tight">Vehicle Walkaround</h3>
-                                <span class="text-xs text-slate-400">Note existing damage before pickup</span>
-                            </div>
-                        </div>
-                        <div class="flex shrink-0 items-center gap-2">
-                            <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">Optional</span>
-                            <svg class="h-4 w-4 text-slate-400 transition-transform duration-200"
-                                 :class="walkaroundOpen ? 'rotate-180' : ''"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </button>
-                    <div x-show="walkaroundOpen"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 -translate-y-1"
-                         class="mt-5 border-t border-slate-100 pt-5">
-                        <label class="form-label" for="walkaround_comments">Condition Comments</label>
-                        <textarea id="walkaround_comments" name="walkaround_comments" rows="3"
-                            placeholder="Note any existing damage, marks, or observations before pickup..."
-                            class="form-input resize-none">{{ old('walkaround_comments') }}</textarea>
-                    </div>
-                </div>
-
                 {{-- Signature --}}
                 <div class="section-card" x-ref="signatureSection">
                     <div class="section-header">
@@ -417,8 +333,115 @@
                     </div>
                 </div>
 
+                {{-- Document Upload --}}
+                <div class="section-card" x-data="{
+                    docs: {
+                        passport:      { file: null, preview: null, label: 'Passport bio page',       sub: 'Photo/data page',          required: true  },
+                        licence_front: { file: null, preview: null, label: 'Licence front',            sub: 'Front side',               required: true  },
+                        licence_back:  { file: null, preview: null, label: 'Licence back',             sub: 'Back side',                required: true  },
+                        visa:          { file: null, preview: null, label: 'Visa page',                sub: 'If applicable — optional', required: false },
+                    },
+                    get uploadedCount() {
+                        return Object.values(this.docs).filter(d => d.file !== null).length;
+                    },
+                    get requiredComplete() {
+                        return ['passport','licence_front','licence_back'].every(k => this.docs[k].file !== null);
+                    },
+                    handleFile(type, event) {
+                        const file = event.target.files[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File must be under 5MB. Please choose a smaller image.');
+                            event.target.value = '';
+                            return;
+                        }
+                        this.docs[type].file = file;
+                        const reader = new FileReader();
+                        reader.onload = (e) => { this.docs[type].preview = e.target.result; };
+                        reader.readAsDataURL(file);
+                    }
+                }" x-init="$watch('requiredComplete', v => { $dispatch('docs-ready', { ready: v }) })">
+
+                    <div class="section-header mb-4">
+                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                            <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/>
+                            </svg>
+                        </div>
+                        <h3 class="section-title">Identity verification</h3>
+                    </div>
+
+                    <p class="mb-3 text-sm text-slate-500">Upload clear photos of your documents. You can photograph them directly with your camera.</p>
+
+                    <div class="mb-3 flex gap-2 rounded-xl border border-blue-100 bg-blue-50 p-3">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="#3B82F6" class="mt-0.5 shrink-0">
+                            <path d="M10 2a8 8 0 1 0 0 16A8 8 0 0 0 10 2zm.75 11.5h-1.5v-5h1.5v5zm0-6.5h-1.5V5.5h1.5V7z"/>
+                        </svg>
+                        <span class="text-xs text-blue-700">Ensure all text is clearly readable and the full document is visible. Max 5MB per file (JPG, PNG or PDF).</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <template x-for="(doc, type) in docs" :key="type">
+                            <div>
+                                <input
+                                    :id="'doc-' + type"
+                                    :name="type"
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    class="hidden"
+                                    @change="handleFile(type, $event)">
+
+                                <label
+                                    :for="'doc-' + type"
+                                    class="relative flex min-h-[110px] cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl p-4 text-center transition-all duration-200"
+                                    :style="doc.file !== null
+                                        ? 'border:2px solid #1D9E75;background:#F0FDF4;'
+                                        : doc.required
+                                            ? 'border:1.5px dashed #D1D5DB;background:#FFFFFF;'
+                                            : 'border:1.5px dashed #E5E7EB;background:#F9FAFB;'">
+
+                                    <span
+                                        class="absolute right-2 top-2 rounded-md px-1.5 py-0.5 text-[9px] font-semibold"
+                                        :style="doc.file !== null
+                                            ? 'background:#DCFCE7;color:#15803D;'
+                                            : doc.required
+                                                ? 'background:#FEE2E2;color:#B91C1C;'
+                                                : 'background:#F3F4F6;color:#6B7280;'"
+                                        x-text="doc.file !== null ? 'Done' : (doc.required ? 'Required' : 'Optional')">
+                                    </span>
+
+                                    <template x-if="doc.preview">
+                                        <img :src="doc.preview" class="h-8 w-12 rounded object-cover border border-slate-200">
+                                    </template>
+                                    <template x-if="!doc.preview">
+                                        <div class="flex h-9 w-9 items-center justify-center rounded-xl"
+                                             :style="doc.required ? 'background:#EFF6FF;' : 'background:#F3F4F6;'">
+                                            <svg width="18" height="18" viewBox="0 0 20 20"
+                                                 :fill="doc.required ? '#3B82F6' : '#9CA3AF'">
+                                                <path d="M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5zm5 2a2 2 0 1 0 4 0 2 2 0 0 0-4 0zm-2 6c0-1.5 1.5-2.5 4-2.5s4 1 4 2.5v.5H6v-.5z"/>
+                                            </svg>
+                                        </div>
+                                    </template>
+
+                                    <span class="text-[11px] font-medium leading-tight"
+                                          :style="doc.file !== null ? 'color:#15803D;' : 'color:#111827;'"
+                                          x-text="doc.label">
+                                    </span>
+                                    <span class="text-[10px]"
+                                          :style="doc.file !== null ? 'color:#22C55E;' : 'color:#9CA3AF;'"
+                                          x-text="doc.file !== null ? 'Tap to change' : doc.sub">
+                                    </span>
+                                </label>
+                            </div>
+                        </template>
+                    </div>
+
+                    <p class="text-center text-xs text-slate-400"
+                       x-text="uploadedCount + ' of 3 required documents uploaded'"></p>
+                </div>
+
                 {{-- Submit --}}
-                <div class="section-card">
+                <div class="section-card" x-data="{ docsReady: false }" @docs-ready.window="docsReady = $event.detail.ready">
                     <div class="flex items-start gap-3 mb-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
                         <svg class="mt-0.5 h-5 w-5 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -429,8 +452,9 @@
                         </p>
                     </div>
 
-                    <button type="submit" :disabled="submitting"
-                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed">
+                    <button type="submit" :disabled="submitting || !docsReady"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-semibold text-white shadow-lg transition active:scale-[0.98] disabled:cursor-not-allowed"
+                        :class="(docsReady && !submitting) ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-300 cursor-not-allowed'">
                         <template x-if="!submitting">
                             <span class="flex items-center gap-2">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

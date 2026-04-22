@@ -83,26 +83,30 @@ class AgreementForm
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Towing / Breakdown')
+                Section::make('Handover details (set by admin before approving)')
+                    ->description('These are NOT filled by the driver. Complete them at vehicle handover before clicking Approve.')
+                    ->icon('heroicon-o-wrench-screwdriver')
+                    ->collapsible()
+                    ->collapsed(false)
                     ->columns(2)
-                    ->collapsed()
                     ->schema([
                         TextInput::make('towing_name')
-                            ->label('Approved Mechanic Name')
+                            ->label('Towing company name')
+                            ->placeholder('e.g. AAA Towing Perth')
+                            ->helperText('Your nominated breakdown recovery company. Driver must use this company if they break down.')
                             ->maxLength(100),
 
                         TextInput::make('towing_phone')
-                            ->label('Towing Phone')
+                            ->label('Towing company phone')
                             ->tel()
+                            ->placeholder('e.g. 0412 999 888')
                             ->maxLength(20),
-                    ]),
 
-                Section::make('Vehicle Walkaround')
-                    ->collapsed()
-                    ->schema([
                         Textarea::make('walkaround_comments')
-                            ->label('Comments')
-                            ->rows(3)
+                            ->label('Vehicle walkaround notes')
+                            ->placeholder('e.g. Minor scratch rear left door. Small chip windscreen bottom right. Otherwise clean.')
+                            ->helperText('Record any existing damage noted during the physical vehicle inspection before handover. Leave blank if vehicle condition is perfect.')
+                            ->rows(4)
                             ->columnSpanFull(),
                     ]),
             ]);

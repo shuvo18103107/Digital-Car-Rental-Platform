@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Agreement;
+use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -29,8 +30,9 @@ class GenerateAgreementPDF implements ShouldQueue
         File::ensureDirectoryExists(dirname($fullPath));
 
         $signatureBase64 = $this->encodeSignature($agreement->signature_path);
+        $ownerSignaturePath = Setting::get('owner_signature_path', 'signatures/owner_signature.png');
 
-        $pdf = Pdf::loadView('pdf.agreement', compact('agreement', 'signatureBase64'))
+        $pdf = Pdf::loadView('pdf.agreement', compact('agreement', 'signatureBase64', 'ownerSignaturePath'))
             ->setPaper('a4', 'portrait');
 
         $pdf->save($fullPath);
