@@ -28,7 +28,7 @@ class AgreementController extends Controller
         $signatureData = $request->input('signature');
         $signatureData = preg_replace('/^data:image\/png;base64,/', '', $signatureData);
         $signatureData = base64_decode($signatureData);
-        $signaturePath = 'signatures/'.str()->uuid().'.png';
+        $signaturePath = 'private/signatures/'.str()->uuid().'.png';
         Storage::put($signaturePath, $signatureData);
 
         $snapshot = Setting::get('agreement_body');

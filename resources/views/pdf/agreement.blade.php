@@ -285,7 +285,7 @@
                 <td style="width:45%; padding-left:20px;">
                     <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">Owner Signature</div>
                     @php
-                        $ownerSigPath = storage_path('app/' . ($ownerSignaturePath ?? 'signatures/owner_signature.png'));
+                        $ownerSigPath = storage_path('app/' . ($ownerSignaturePath ?? 'private/signatures/owner_signature.png'));
                     @endphp
                     @if(file_exists($ownerSigPath))
                         <img src="{{ $ownerSigPath }}"

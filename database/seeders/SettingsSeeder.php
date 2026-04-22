@@ -159,7 +159,9 @@ class SettingsSeeder extends Seeder
             ['key' => 'admin_email',          'value' => 'admin@carrentalperth.com'],
             ['key' => 'owner_name',           'value' => 'Faisal Rasheed'],
             ['key' => 'company_name',         'value' => 'Faisal Car Rentals Perth'],
-            ['key' => 'owner_signature_path', 'value' => 'signatures/owner_signature.png'],
+            ['key' => 'company_address',       'value' => '58 Royal Street, Tuart Hill, Perth WA'],
+            ['key' => 'company_phone',         'value' => '0424 022 786'],
+            ['key' => 'owner_signature_path', 'value' => 'private/signatures/owner_signature.png'],
         ];
 
         foreach ($rows as $row) {
