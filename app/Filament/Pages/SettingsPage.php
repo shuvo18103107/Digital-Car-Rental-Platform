@@ -73,7 +73,7 @@ class SettingsPage extends Page
                     ->description('These are email addresses that receive copies of agreements — NOT your login credentials. To change your login email or password, go to My Profile (top-right avatar menu).')
                     ->schema([
                         TextInput::make('admin_email')
-                            ->label('Admin notification email')
+                            ->label('Company admin notification email')
                             ->email()
                             ->required()
                             ->helperText('Receives a PDF copy of every approved agreement. This is NOT your login email.'),
