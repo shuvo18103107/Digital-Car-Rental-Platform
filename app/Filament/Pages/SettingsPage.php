@@ -56,17 +56,19 @@ class SettingsPage extends Page
                             ->label('Owner signature image')
                             ->image()
                             ->disk('local')
-                            ->directory('signatures')
+                            ->directory('private/signatures')
                             ->acceptedFileTypes(['image/png', 'image/jpeg'])
                             ->maxSize(1024)
                             ->helperText('PNG or JPG. This signature appears on all generated PDFs.')
                             ->saveUploadedFileUsing(function ($file) {
-                                $filename = 'owner_signature.'.$file->getClientOriginalExtension();
-                                $file->storeAs('signatures', $filename, 'local');
-                                Setting::set('owner_signature_path', 'signatures/'.$filename);
+                                $filename = 'owner_signature.' . $file->getClientOriginalExtension();
 
-                                return 'signatures/'.$filename;
-                            }),
+                                $path = $file->storeAs('private/signatures', $filename, 'local');
+
+                                Setting::set('owner_signature_path', $path);
+
+                                return $path;
+                            })
                     ]),
 
                 Section::make('Notification settings')
