@@ -21,18 +21,33 @@ class GenerateAgreementPDF implements ShouldQueue
         $agreement = $this->agreement;
 
         $path = 'agreements/'
-            .date('Y').'/'
-            .date('m').'/'
-            .$agreement->agreement_number.'.pdf';
+            . date('Y') . '/'
+            . date('m') . '/'
+            . $agreement->agreement_number . '.pdf';
 
         $fullPath = Storage::disk('local')->path($path);
 
         File::ensureDirectoryExists(dirname($fullPath));
 
         $signatureBase64 = $this->encodeSignature($agreement->signature_path);
-        $ownerSignaturePath = Setting::get('owner_signature_path', 'signatures/owner_signature.png');
 
-        $pdf = Pdf::loadView('pdf.agreement', compact('agreement', 'signatureBase64', 'ownerSignaturePath'))
+        $ownerSignaturePath = Setting::get(
+            'owner_signature_path',
+            'private/signatures/owner_signature.png'
+        );
+
+        $settings = [
+            'companyName' => Setting::get('company_name'),
+            'companyAddress' => Setting::get('company_address'),
+            'companyPhone' => Setting::get('company_phone'),
+            'ownerName' => Setting::get('owner_name'),
+        ];
+
+        $pdf = Pdf::loadView('pdf.agreement', array_merge([
+            'agreement' => $agreement,
+            'signatureBase64' => $signatureBase64,
+            'ownerSignaturePath' => $ownerSignaturePath,
+        ], $settings))
             ->setPaper('a4', 'portrait');
 
         $pdf->save($fullPath);
@@ -54,6 +69,6 @@ class GenerateAgreementPDF implements ShouldQueue
             return null;
         }
 
-        return 'data:image/png;base64,'.base64_encode(file_get_contents($fullPath));
+        return 'data:image/png;base64,' . base64_encode(file_get_contents($fullPath));
     }
 }

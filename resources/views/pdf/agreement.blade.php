@@ -183,7 +183,7 @@
     <div class="header">
         <div class="header-top">
             <div>
-                <div class="company-name">Faisal Car Rentals Perth</div>
+                <div class="company-name">{{ $companyName ?? 'Faisal Car Rentals Perth' }}</div>
                 <div class="doc-title">Car Rental Agreement</div>
             </div>
             <div class="agreement-id">
@@ -194,16 +194,16 @@
         </div>
     </div>
 
-    {{-- ── PART B — Owner details (hardcoded, never changes) ── --}}
+    {{-- ── OWNER DETAILS ── --}}
     <div class="section-title">Owner Information</div>
     <div class="owner-block">
-        <span class="owner-label">Owner:</span> Faisal Rasheed<br>
-        <span class="owner-label">Address:</span> 58 Royal Street, Tuart Hill, Perth WA<br>
-        <span class="owner-label">Phone:</span> 0424 022 786<br>
+        <span class="owner-label">Owner:</span> {{ $ownerName ?? 'Faisal Rasheed' }}<br>
+        <span class="owner-label">Address:</span> {{ $companyAddress ?? '58 Royal Street, Tuart Hill, Perth WA' }}<br>
+        <span class="owner-label">Phone:</span> {{ $companyPhone ?? '0424 022 786' }}<br>
         <span class="owner-label">Insurance:</span> Commercial Comprehensive — AUD $2,000 excess per incident
     </div>
 
-    {{-- ── PART C — Vehicle & Agreement Details ── --}}
+    {{-- ── VEHICLE DETAILS ── --}}
     <div class="section-title">Vehicle &amp; Agreement Details</div>
     <table class="fields">
         <tr>
@@ -226,7 +226,7 @@
         </tr>
     </table>
 
-    {{-- ── PART C — Driver / Renter Information ── --}}
+    {{-- ── DRIVER INFO ── --}}
     <div class="section-title">Driver / Renter Information</div>
     <table class="fields">
         <tr>
@@ -247,58 +247,58 @@
             <td class="label">Email Address</td>
             <td class="value" colspan="3">{{ $agreement->driver_email }}</td>
         </tr>
-        @if($agreement->towing_name || $agreement->towing_phone)
-        <tr>
-            <td class="label">Approved Mechanic</td>
-            <td class="value">{{ $agreement->towing_name }}</td>
-            <td class="label">Towing Phone</td>
-            <td class="value">{{ $agreement->towing_phone }}</td>
-        </tr>
-        @endif
-        @if($agreement->walkaround_comments)
-        <tr>
-            <td class="label">Walkaround Notes</td>
-            <td class="value" colspan="3">{{ $agreement->walkaround_comments }}</td>
-        </tr>
-        @endif
     </table>
 
-    {{-- ── PART A — Agreement body (frozen snapshot) ── --}}
+    {{-- ── TERMS ── --}}
     <div class="section-title">Terms &amp; Conditions</div>
     <div class="agreement-body">
         {!! $agreement->agreement_snapshot !!}
     </div>
 
-    {{-- ── SIGNATURE BLOCK ── --}}
+    {{-- ── SIGNATURES ── --}}
     <div class="signature-block">
         <table>
             <tr>
                 <td style="width:55%">
-                    <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">Driver / Renter Signature</div>
+                    <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">
+                        Driver / Renter Signature
+                    </div>
+
                     @if($signatureBase64)
                         <img src="{{ $signatureBase64 }}" alt="Signature">
                     @else
                         <div style="height:60px; border:1px dashed #ccc;"></div>
                     @endif
+
                     <div class="sig-line">{{ $agreement->driver_name }}</div>
                 </td>
+
                 <td style="width:45%; padding-left:20px;">
-                    <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">Owner Signature</div>
+                    <div style="font-size:8.5pt; font-weight:bold; color:#555; margin-bottom:4px;">
+                        Owner Signature
+                    </div>
+
                     @php
-                        $ownerSigPath = storage_path('app/' . ($ownerSignaturePath ?? 'private/signatures/owner_signature.png'));
+                        $ownerSigPath = storage_path(
+                            'app/' . ($ownerSignaturePath ?? 'private/signatures/owner_signature.png')
+                        );
                     @endphp
+
                     @if(file_exists($ownerSigPath))
                         <img src="{{ $ownerSigPath }}"
                              style="height:45px; max-width:180px; object-fit:contain; display:block;">
                     @else
                         <div style="height:45px; border-bottom:1px solid #000; width:180px;"></div>
                     @endif
-                    <div class="sig-line">Faisal Rasheed</div>
+
+                    <div class="sig-line">{{ $ownerName ?? 'Faisal Rasheed' }}</div>
                 </td>
             </tr>
         </table>
+
         <div style="margin-top:10px; font-size:8pt; color:#555;">
-            <strong>Date Signed:</strong> {{ $agreement->approved_at?->format('d M Y, h:i A') ?? now()->format('d M Y, h:i A') }}
+            <strong>Date Signed:</strong>
+            {{ $agreement->approved_at?->format('d M Y, h:i A') ?? now()->format('d M Y, h:i A') }}
             &nbsp;&nbsp;|&nbsp;&nbsp;
             <strong>Agreement ID:</strong> {{ $agreement->agreement_number }}
             &nbsp;&nbsp;|&nbsp;&nbsp;
@@ -308,8 +308,13 @@
 
     {{-- ── FOOTER ── --}}
     <div class="footer">
-        Faisal Car Rentals Perth &nbsp;|&nbsp; 58 Royal Street, Tuart Hill, Perth WA &nbsp;|&nbsp; 0424 022 786
-        &nbsp;|&nbsp; This document is legally binding once signed by both parties.
+        {{ $companyName ?? 'Faisal Car Rentals Perth' }}
+        &nbsp;|&nbsp;
+        {{ $companyAddress ?? '58 Royal Street, Tuart Hill, Perth WA' }}
+        &nbsp;|&nbsp;
+        {{ $companyPhone ?? '0424 022 786' }}
+        &nbsp;|&nbsp;
+        This document is legally binding once signed by both parties.
     </div>
 
 </div>
