@@ -3,6 +3,13 @@
 @section('title', 'Rental Agreement')
 
 @section('content')
+@php
+    use App\Models\Setting;
+
+    $companyName = Setting::get('company_name') ?? 'Faisal Car Rentals Perth';
+    $companyAddress = Setting::get('company_address') ?? '58 Royal Street, Tuart Hill, Perth WA';
+    $companyPhone = Setting::get('company_phone') ?? '0424 022 786';
+@endphp
 <div x-data="{
     termsOpen: false,
     signaturePad: null,
@@ -104,9 +111,9 @@
                         </svg>
                         <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Car Rental Agreement</span>
                     </div>
-                    <p class="text-sm font-bold text-slate-800">Faisal Car Rentals Perth</p>
-                    <p class="text-xs text-slate-500">58 Royal Street, Tuart Hill, Perth WA</p>
-                    <p class="text-xs text-slate-400">0424 022 786</p>
+                    <p class="text-sm font-bold text-slate-800">{{ $companyName }}</p>
+                    <p class="text-xs text-slate-500">{{ $companyAddress }}</p>
+                    <p class="text-xs text-slate-400">{{ $companyPhone }}</p>
                 </div>
 
                 {{-- Faded text preview --}}
@@ -553,7 +560,7 @@
             <div class="flex shrink-0 items-center justify-between border-b border-slate-100 px-6 py-4">
                 <div>
                     <h3 class="text-lg font-bold text-slate-800">Rental Agreement</h3>
-                    <p class="text-xs text-slate-400">Faisal Car Rentals Perth — Full terms & conditions</p>
+                    <p class="text-xs text-slate-400">{{ $companyName }} — Full terms & conditions</p>
                 </div>
                 <button @click="termsOpen = false" type="button"
                     class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-400 transition hover:border-slate-300 hover:text-slate-600">

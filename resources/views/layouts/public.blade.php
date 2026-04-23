@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+@php
+    use App\Models\Setting;
+
+    $companyName = Setting::get('company_name') ?? 'Faisal Car Rentals Perth';
+    $companyAddress = Setting::get('company_address') ?? '58 Royal Street, Tuart Hill, Perth WA';
+    $companyPhone = Setting::get('company_phone') ?? '0424 022 786';
+@endphp
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e3a5f">
-    <title>@yield('title', 'Car Rental Agreement') — Faisal Car Rentals Perth</title>
+    <title>@yield('title', 'Car Rental Agreement') — {{ $companyName }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,7 +85,7 @@
                     </div>
                 </a>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">Faisal Car Rentals Perth</h1>
+                    <h1 class="text-xl font-bold tracking-tight text-white">{{ $companyName }}</h1>
                     <p class="text-sm text-blue-300">Digital Rental Agreement Portal</p>
                 </div>
             </div>
@@ -91,7 +98,7 @@
 
     <footer class="border-t border-slate-200 bg-white/70 py-6 text-center">
         <p class="text-sm text-slate-400">
-            © {{ date('Y') }} Faisal Car Rentals Perth · 58 Royal Street, Tuart Hill, Perth WA · 0424 022 786
+            © {{ date('Y') }} {{ $companyName }} · {{ $companyAddress }} · {{ $companyPhone }}
         </p>
     </footer>
 
