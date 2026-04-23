@@ -31,6 +31,8 @@ class SettingsPage extends Page
             'owner_email' => Setting::get('owner_email', ''),
             'admin_email' => Setting::get('admin_email', ''),
             'company_name' => Setting::get('company_name', ''),
+            'company_address' => Setting::get('company_address', ''),
+            'company_phone' => Setting::get('company_phone', ''),
         ]);
     }
 
@@ -51,6 +53,16 @@ class SettingsPage extends Page
                             ->email()
                             ->required()
                             ->helperText('Receives a copy of every signed agreement'),
+                        
+                        TextInput::make('company_address')
+                            ->label('Owner address')
+                            ->required()
+                            ->helperText('Appears on PDFs and footer'),
+
+                        TextInput::make('company_phone')
+                            ->label('Owner phone')
+                            ->required()
+                            ->helperText('Appears on PDFs and footer'),
 
                         FileUpload::make('owner_signature_file')
                             ->label('Owner signature image')
@@ -92,7 +104,7 @@ class SettingsPage extends Page
     {
         $data = $this->form->getState();
 
-        foreach (['owner_name', 'owner_email', 'admin_email', 'company_name'] as $key) {
+        foreach (['owner_name', 'owner_email', 'admin_email', 'company_name', 'company_address', 'company_phone'] as $key) {
             Setting::set($key, $data[$key] ?? '');
         }
 
