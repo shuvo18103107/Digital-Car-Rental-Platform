@@ -70,8 +70,8 @@ class SettingsPage extends Page
                             ->disk('local')
                             ->directory('private/signatures')
                             ->acceptedFileTypes(['image/png', 'image/jpeg'])
-                            ->maxSize(1024)
-                            ->helperText('PNG or JPG. This signature appears on all generated PDFs.')
+                            ->maxSize(1024*1024*5)
+                            ->helperText('PNG or JPG. Max 5MB. This signature appears on all generated PDFs.')
                             ->saveUploadedFileUsing(function ($file) {
                                 $filename = 'owner_signature.' . $file->getClientOriginalExtension();
 
