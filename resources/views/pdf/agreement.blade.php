@@ -277,6 +277,23 @@
             </tr>
         </table>
 
+        {{-- ── HANDOVER DETAILS ── --}}
+        <div class="section-title">Handover Details</div>
+        <table class="fields">
+            <tr>
+                <td class="label">Approved Towing / Mechanic</td>
+                <td class="value">{{ $agreement->towing_name ?: '—' }}</td>
+                <td class="label">Towing Contact</td>
+                <td class="value">{{ $agreement->towing_phone ?: '—' }}</td>
+            </tr>
+            @if ($agreement->walkaround_comments)
+                <tr>
+                    <td class="label">Vehicle Walkaround Notes</td>
+                    <td class="value" colspan="3">{{ $agreement->walkaround_comments }}</td>
+                </tr>
+            @endif
+        </table>
+
         {{-- ── TERMS ── --}}
         <div class="section-title">Terms &amp; Conditions</div>
         <div class="agreement-body">
