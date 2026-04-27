@@ -38,9 +38,10 @@ class AgreementApproved extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromPath(Storage::disk('local')->path($this->agreement->pdf_path))
-                ->as($this->agreement->agreement_number.'.pdf')
-                ->withMime('application/pdf'),
+            Attachment::fromData(
+                fn () => Storage::disk('s3')->get($this->agreement->pdf_path),
+                $this->agreement->agreement_number.'.pdf'
+            )->withMime('application/pdf'),
         ];
     }
 }

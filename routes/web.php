@@ -13,10 +13,11 @@ Route::post('/submit', [AgreementController::class, 'store'])
     ->name('agreement.store');
 
 Route::get('/admin/signature/{agreement}', function (Agreement $agreement) {
-    $path = Storage::disk('local')->path($agreement->signature_path);
-
-    if (file_exists($path) && filesize($path) > 0) {
-        return response()->file($path);
+    if (Storage::disk('s3')->exists($agreement->signature_path)) {
+        return response(Storage::disk('s3')->get($agreement->signature_path), 200, [
+            'Content-Type' => 'image/png',
+            'Cache-Control' => 'private, max-age=300',
+        ]);
     }
 
     $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="48" viewBox="0 0 120 48">'
@@ -28,13 +29,28 @@ Route::get('/admin/signature/{agreement}', function (Agreement $agreement) {
     return response($svg, 200, ['Content-Type' => 'image/svg+xml']);
 })->middleware(['auth'])->name('admin.signature');
 
+Route::get('/admin/agreements/{agreement}/download-pdf', function (Agreement $agreement) {
+    abort_unless(auth()->guard('web')->check(), 403);
+    abort_if(! $agreement->pdf_path || $agreement->status !== 'approved', 404);
+
+    $content = Storage::disk('s3')->get($agreement->pdf_path);
+
+    return response()->streamDownload(function () use ($content) {
+        echo $content;
+    }, $agreement->agreement_number.'.pdf', ['Content-Type' => 'application/pdf']);
+})->middleware('auth')->name('admin.agreements.download-pdf');
+
 Route::get('/admin/documents/{document}/download', function (AgreementDocument $document) {
     abort_unless(auth()->guard('web')->check(), 403);
 
-    $fullPath = Storage::disk('local')->path($document->file_path);
     $filename = $document->document_type_label.'.'.pathinfo($document->file_path, PATHINFO_EXTENSION);
+    $content = Storage::disk('s3')->get($document->file_path);
 
-    return response()->download($fullPath, $filename);
+    return response($content)
+        ->withHeaders([
+            'Content-Type' => $document->mime_type ?? 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
 })->middleware('auth')->name('admin.documents.download');
 
 Route::get('/success', fn () => view('agreement.success', [

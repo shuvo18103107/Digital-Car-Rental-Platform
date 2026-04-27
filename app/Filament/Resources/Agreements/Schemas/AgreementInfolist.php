@@ -71,7 +71,7 @@ class AgreementInfolist
                     ->schema([
                         ImageEntry::make('signature_path')
                             ->label('')
-                            ->disk('local')
+                            ->getStateUsing(fn ($record) => route('admin.signature', $record))
                             ->height(80)
                             ->columnSpanFull(),
                     ]),

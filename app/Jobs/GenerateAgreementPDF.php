@@ -7,7 +7,6 @@ use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class GenerateAgreementPDF implements ShouldQueue
@@ -21,13 +20,9 @@ class GenerateAgreementPDF implements ShouldQueue
         $agreement = $this->agreement;
 
         $path = 'agreements/'
-            . date('Y') . '/'
-            . date('m') . '/'
-            . $agreement->agreement_number . '.pdf';
-
-        $fullPath = Storage::disk('local')->path($path);
-
-        File::ensureDirectoryExists(dirname($fullPath));
+            .date('Y').'/'
+            .date('m').'/'
+            .$agreement->agreement_number.'.pdf';
 
         $signatureBase64 = $this->encodeSignature($agreement->signature_path);
 
@@ -35,6 +30,7 @@ class GenerateAgreementPDF implements ShouldQueue
             'owner_signature_path',
             'private/signatures/owner_signature.png'
         );
+        $ownerSignatureBase64 = $this->encodeSignature($ownerSignaturePath);
 
         $settings = [
             'companyName' => Setting::get('company_name'),
@@ -43,14 +39,15 @@ class GenerateAgreementPDF implements ShouldQueue
             'ownerName' => Setting::get('owner_name'),
         ];
 
-        $pdf = Pdf::loadView('pdf.agreement', array_merge([
+        $pdfContent = Pdf::loadView('pdf.agreement', array_merge([
             'agreement' => $agreement,
             'signatureBase64' => $signatureBase64,
-            'ownerSignaturePath' => $ownerSignaturePath,
+            'ownerSignatureBase64' => $ownerSignatureBase64,
         ], $settings))
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait')
+            ->output();
 
-        $pdf->save($fullPath);
+        Storage::disk('s3')->put($path, $pdfContent);
 
         $agreement->update(['pdf_path' => $path]);
 
@@ -63,12 +60,10 @@ class GenerateAgreementPDF implements ShouldQueue
             return null;
         }
 
-        $fullPath = Storage::disk('local')->path($path);
-
-        if (! file_exists($fullPath)) {
+        if (! Storage::disk('s3')->exists($path)) {
             return null;
         }
 
-        return 'data:image/png;base64,' . base64_encode(file_get_contents($fullPath));
+        return 'data:image/png;base64,'.base64_encode(Storage::disk('s3')->get($path));
     }
 }

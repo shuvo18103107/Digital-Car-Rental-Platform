@@ -53,7 +53,7 @@ class SettingsPage extends Page
                             ->email()
                             ->required()
                             ->helperText('Receives a copy of every signed agreement'),
-                        
+
                         TextInput::make('company_address')
                             ->label('Owner address')
                             ->required()
@@ -70,17 +70,17 @@ class SettingsPage extends Page
                             ->disk('local')
                             ->directory('private/signatures')
                             ->acceptedFileTypes(['image/png', 'image/jpeg'])
-                            ->maxSize(1024*1024*5)
+                            ->maxSize(1024 * 1024 * 5)
                             ->helperText('PNG or JPG. Max 5MB. This signature appears on all generated PDFs.')
                             ->saveUploadedFileUsing(function ($file) {
-                                $filename = 'owner_signature.' . $file->getClientOriginalExtension();
+                                $filename = 'owner_signature.'.$file->getClientOriginalExtension();
 
-                                $path = $file->storeAs('private/signatures', $filename, 'local');
+                                $path = $file->storeAs('private/signatures', $filename, 's3');
 
                                 Setting::set('owner_signature_path', $path);
 
                                 return $path;
-                            })
+                            }),
                     ]),
 
                 Section::make('Notification settings')

@@ -59,7 +59,7 @@ class AgreementController extends Controller
                 $path = $file->storeAs(
                     'documents/'.$agreement->agreement_number,
                     $type.'.'.$file->getClientOriginalExtension(),
-                    'local'
+                    's3'
                 );
 
                 AgreementDocument::create([

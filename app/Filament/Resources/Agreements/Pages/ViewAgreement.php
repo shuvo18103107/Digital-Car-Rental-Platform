@@ -37,10 +37,12 @@ class ViewAgreement extends ViewRecord
                 ->modalSubmitActionLabel('Approve')
                 ->visible(fn () => $this->record->status === 'pending')
                 ->action(function () {
+                    /** @var \App\Models\User $admin */
+                    $admin = auth()->user();
                     $this->record->update([
                         'status' => 'approved',
                         'approved_at' => now(),
-                        'approved_by' => auth()->user()->email,
+                        'approved_by' => $admin->email,
                     ]);
                     GenerateAgreementPDF::dispatch($this->record);
                     Notification::make()
@@ -66,11 +68,13 @@ class ViewAgreement extends ViewRecord
                 ])
                 ->visible(fn () => $this->record->status === 'pending')
                 ->action(function (array $data) {
+                    /** @var \App\Models\User $admin */
+                    $admin = auth()->user();
                     $this->record->update([
                         'status' => 'rejected',
                         'rejection_note' => $data['rejection_note'],
                         'rejected_at' => now(),
-                        'rejected_by' => auth()->user()->email,
+                        'rejected_by' => $admin->email,
                     ]);
                     SendRejectionEmail::dispatch($this->record);
                     Notification::make()
@@ -85,10 +89,8 @@ class ViewAgreement extends ViewRecord
                 ->icon(Heroicon::OutlinedArrowDownTray)
                 ->color('gray')
                 ->visible(fn () => $this->record->status === 'approved' && $this->record->pdf_path)
-                ->action(fn () => Storage::disk('local')->download(
-                    $this->record->pdf_path,
-                    $this->record->agreement_number.'.pdf'
-                )),
+                ->url(fn () => route('admin.agreements.download-pdf', $this->record))
+                ->openUrlInNewTab(),
 
             Action::make('resendEmails')
                 ->label('Resend emails')
@@ -116,10 +118,12 @@ class ViewAgreement extends ViewRecord
                 ->modalSubmitActionLabel('Reset')
                 ->visible(fn () => in_array($this->record->status, ['approved', 'rejected']) && ! $this->record->is_reset)
                 ->action(function () {
+                    /** @var \App\Models\User $admin */
+                    $admin = auth()->guard()->user();
                     $this->record->update([
                         'is_reset' => true,
                         'reset_at' => now(),
-                        'reset_by' => auth()->user()->email,
+                        'reset_by' => $admin->email,
                     ]);
                     Notification::make()
                         ->title('Licence lock cleared. Driver can now submit a new agreement.')
