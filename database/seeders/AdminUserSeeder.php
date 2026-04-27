@@ -10,11 +10,21 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Owner — Faisal Rasheed
         User::updateOrCreate(
-            ['email' => 'admin@carrentalperth.com'],
+            ['email' => 'faisalrasheed1994@gmail.com'],
             [
-                'name' => 'Faisal Admin',
-                'password' => Hash::make('admin123'),
+                'name' => 'Faisal Rasheed',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        // Admin — Dayyan
+        User::updateOrCreate(
+            ['email' => 'infodayyan786@gmail.com'],
+            [
+                'name' => 'Dayyan',
+                'password' => Hash::make('password'),
             ]
         );
     }
